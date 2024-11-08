@@ -32,7 +32,7 @@ public class ActeurRepositoryTest {
 	@Test
 	public void testExtraireActeursTriesParIdentite() {
 
-		TypedQuery<Acteur> query = em.createQuery("SELECT a FROM Acteur a", Acteur.class);
+		TypedQuery<Acteur> query = em.createQuery("SELECT a FROM Acteur a  order by a.identite", Acteur.class);
 		List<Acteur> acteurs = query.getResultList();
 
 		assertEquals(1137, acteurs.size());
@@ -44,7 +44,8 @@ public class ActeurRepositoryTest {
 	 */
 	@Test
 	public void testExtraireActeursParIdentite() {
-		TypedQuery<Acteur> query = em.createQuery("SELECT a FROM Acteur a", Acteur.class);
+		TypedQuery<Acteur> query = em.createQuery("SELECT a FROM Acteur a where a. identite=:ident", Acteur.class);
+		query.setParameter("ident", "Marion Cotillard");
 		List<Acteur> acteurs = query.getResultList();
 
 		assertEquals(1, acteurs.size());
@@ -57,7 +58,7 @@ public class ActeurRepositoryTest {
 	 */
 	@Test
 	public void testExtraireActeursParAnneeNaissance() {
-		TypedQuery<Acteur> query = em.createQuery("SELECT a FROM Acteur a", Acteur.class);
+		TypedQuery<Acteur> query = em.createQuery("SELECT a FROM Acteur a where year(a.anniversaire)=1985", Acteur.class);
 		List<Acteur> acteurs = query.getResultList();
 
 		assertEquals(10, acteurs.size());
@@ -69,7 +70,8 @@ public class ActeurRepositoryTest {
 	@Test
 	public void testExtraireActeursParRole() {
 
-		TypedQuery<Acteur> query = em.createQuery("SELECT a FROM Acteur a", Acteur.class);
+		TypedQuery<Acteur> query = em.createQuery("SELECT a FROM Acteur a JOIN a.roles r where r.nom=:nom ", Acteur.class);
+		query.setParameter("nom", "Harley Quinn");
 		List<Acteur> acteurs = query.getResultList();
 
 		assertEquals(1, acteurs.size());
@@ -81,7 +83,7 @@ public class ActeurRepositoryTest {
 	 */
 	@Test
 	public void testExtraireActeursParFilmParuAnnee() {
-		TypedQuery<Acteur> query = em.createQuery("SELECT a FROM Acteur a", Acteur.class);
+		TypedQuery<Acteur> query = em.createQuery("SELECT a FROM Acteur a JOIN a.roles r where r.film.annee=2015", Acteur.class);
 		List<Acteur> acteurs = query.getResultList();
 		assertEquals(119, acteurs.size());
 	}
@@ -91,7 +93,8 @@ public class ActeurRepositoryTest {
 	 */
 	@Test
 	public void testExtraireActeursParPays() {
-		TypedQuery<Acteur> query = em.createQuery("SELECT a FROM Acteur a", Acteur.class);
+		TypedQuery<Acteur> query = em.createQuery("SELECT a FROM Acteur a JOIN a.roles r JOIN r.film.pays p where p.nom=:nomP", Acteur.class);
+		query.setParameter("nomP", "France");
 		List<Acteur> acteurs = query.getResultList();
 		assertEquals(158, acteurs.size());
 	}
@@ -102,7 +105,8 @@ public class ActeurRepositoryTest {
 	 */
 	@Test
 	public void testExtraireActeursParListePaysEtAnnee() {
-		TypedQuery<Acteur> query = em.createQuery("SELECT a FROM Acteur a", Acteur.class);
+		TypedQuery<Acteur> query = em.createQuery("SELECT a FROM Acteur a JOIN a.roles r JOIN r.film f JOIN f.pays p WHERE f.annee = 2017 AND p.nom = :nomp", Acteur.class);
+		query.setParameter("nomp", "France");
 		List<Acteur> acteurs = query.getResultList();
 		assertEquals(24, acteurs.size());
 	}
@@ -113,7 +117,8 @@ public class ActeurRepositoryTest {
 	 */
 	@Test
 	public void testExtraireParRealisateurEntreAnnee() {
-		TypedQuery<Acteur> query = em.createQuery("SELECT a FROM Acteur a", Acteur.class);
+		TypedQuery<Acteur> query = em.createQuery("SELECT a FROM Acteur a JOIN a.roles r JOIN r.film f JOIN f.realisateurs real where real.identite=:ident and f.annee between 2010 and 2020", Acteur.class);
+		query.setParameter("ident", "Ridley Scott");
 		List<Acteur> acteurs = query.getResultList();
 		assertEquals(27, acteurs.size());
 	}
@@ -123,7 +128,8 @@ public class ActeurRepositoryTest {
 	 */
 	@Test
 	public void testExtraireRealisateursParActeur() {
-		TypedQuery<Realisateur> query = em.createQuery("SELECT r FROM Realisateur r", Realisateur.class);
+		TypedQuery<Realisateur> query = em.createQuery("SELECT r FROM Realisateur r JOIN r.films f JOIN f.roles ro where ro.acteur.identite=:nomA", Realisateur.class);
+		query.setParameter("nomA", "Brad Pitt");
 		List<Realisateur> acteurs = query.getResultList();
 		assertEquals(6, acteurs.size());
 	}
